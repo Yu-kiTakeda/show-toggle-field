@@ -1,0 +1,73 @@
+* {
+  font-size: 14px;
+}
+button {
+  cursor: pointer;
+}
+li.kintoneplugin-row {
+  margin: 10px;
+  padding: 10px;
+  border: 2px solid #87CEEB;
+  border-radius: 20px;
+  .kintoneplugin-title {
+    display: inline-block;
+    font-size: 16px;
+    border-bottom: 2px solid #BABABA;
+    font-weight: bold;
+  }
+  .buttons {
+    margin-top: 5px;
+    button {
+      font-size: 20px;
+      line-height: 1;
+      .fa-plus-circle, .fa-plus {
+        color: #5de3cc;
+      }
+      .fa-minus-circle, .fa-minus {
+        color: #FF0000;
+      }
+    }
+  }
+  
+  .isShow-default {
+    .radio-title {
+      display: inline-block;
+      margin-right: 20px;
+    }
+    label:not(:last-of-type) {
+      margin-right: 10px;
+    }
+  }
+  .list-condition {
+    li {
+      position: relative;
+      margin-bottom: 5px;
+      > select,> input {        
+        &:not(:last-child) {
+          margin-right: 5px;
+        }
+      }
+    }
+    &:first-of-type {
+      margin-top: 5px;
+    }
+    .select_or-and {
+      position: absolute;
+      transform: translate(0, -100%);
+      top: -5px;
+      left: 250px;
+    }
+  }
+  div.buttons {
+    display: inline-block;
+    > button:not(:last-child) {
+      margin-right: 5px;
+    }
+  }  
+}
+div.buttons > button:not(:last-child) {
+  margin-right: 20px;
+}
+div.save-buttons {
+  padding: 0 0 30px 10px;
+}
