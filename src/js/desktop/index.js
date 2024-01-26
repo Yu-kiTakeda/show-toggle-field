@@ -19,7 +19,7 @@
         return condtion.field;
       }));
     }, []).reduce((events, field) => {
-      return events.concat(['app.record.create.change.', 'app.record.edit.change'].map(e => e + field));
+      return events.concat(['app.record.create.change.', 'app.record.edit.change.'].map(e => e + field));
     }, [])
   ];
   kintone.events.on(events, function(event) {
