@@ -1,6 +1,6 @@
 {
   "manifest_version": 1,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "APP",
   "name": {
     "ja": "フィールド表示切替プラグイン",
@@ -19,7 +19,7 @@
     "css": []
   },
   "mobile": {
-    "js": [],
+    "js": ["js/mobile.bundle.js"],
     "css": []
   },
   "config": {

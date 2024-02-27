@@ -5,7 +5,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   entry: {
     'config': './src/js/config/index.jsx',
-    'desktop': './src/js/desktop/index.js'
+    'desktop': './src/js/desktop/index.js',
+    'mobile': './src/js/mobile/index.js'
   },
   output: {
     path: path.resolve(__dirname, 'plugin', 'js'),
@@ -52,6 +53,6 @@ module.exports = {
     extensions: ['.jsx', '.js']
   },
   externals: {
-    "kintoneConfigHelper": 'kintoneConfigHelper'
+    "KintoneConfigHelper": 'KintoneConfigHelper'
   }
 }

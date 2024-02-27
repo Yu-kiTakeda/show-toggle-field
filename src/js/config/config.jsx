@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 
-// import { KintoneConfigHelper } from "kintone-config-helper";
+// import { KintoneConfigHelper } from "KintoneConfigHelper";
 
 export default function Config({pluginId}) {
   
@@ -99,7 +99,8 @@ export default function Config({pluginId}) {
     location.href = location.href.match(/.*\//)[0];
   };
 
-  useEffect(() => {    
+  useEffect(() => {
+    console.log(KintoneConfigHelper);
     KintoneConfigHelper.getFields().then(getFields => {
         setFields(getFields.filter(getF => getF.type !== 'SPACER'));
     }).catch(error => {

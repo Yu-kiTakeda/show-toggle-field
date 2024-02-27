@@ -8,7 +8,7 @@
     "dev": "webpack --mode development --devtool eval-cheap-source-map --watch",
     "build": "webpack --mode production",
     "first-packaging": "kintone-plugin-packer --out dist/plugin.zip ./",
-    "upload": "kintone-plugin-uploader dist/plugin.zip --watch --waiting-dialog-ms 3000"
+    "upload": "kintone-plugin-uploader --base-url https://hostname.cybozu.com dist/plugin.1.0.5.zip"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "@babel/core": "^7.23.7",
     "@babel/preset-env": "^7.23.7",
     "@babel/preset-react": "^7.23.3",
+    "@kintone/plugin-uploader": "^9.0.3",
     "@kintone/webpack-plugin-kintone-plugin": "^8.0.4",
     "babel-loader": "^9.1.3",
     "core-js": "^3.35.0",
