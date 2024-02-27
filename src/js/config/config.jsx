@@ -99,8 +99,7 @@ export default function Config({pluginId}) {
     location.href = location.href.match(/.*\//)[0];
   };
 
-  useEffect(() => {
-    console.log(KintoneConfigHelper);
+  useEffect(() => {  
     KintoneConfigHelper.getFields().then(getFields => {
         setFields(getFields.filter(getF => getF.type !== 'SPACER'));
     }).catch(error => {
