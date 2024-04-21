@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from "react";
-
+import { Autocomplete, TextField, Box, ThemeProvider } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
 // import { KintoneConfigHelper } from "KintoneConfigHelper";
 
 export default function Config({pluginId}) {
-  
+    
   const initialCondition = {
     field: '', compare: '', compareVal: '', isOr: true
   };
@@ -18,8 +19,10 @@ export default function Config({pluginId}) {
   const [options, setOptions] = useState([initialOption]);
   const [fields, setFields] = useState([]);
 
-  const excludeConditionFieldTypes = ['FILE', 'USER_SELECT', 'ORGANIZATION_SELECT', 'GROUP_SELECT','REFERENCE_TABLE', 'SUBTABLE', 'GROUP', 'CREATOR', 'MODIFIER'];
-  const conditionFields = fields.filter(field => excludeConditionFieldTypes.indexOf(field.type) < 0);
+  const excludeFieldTypes = ['CATEGORY', 'STATUS', 'STATUS_ASSIGNEE'];
+  const excludeConditionFieldTypes = ['FILE', 'GROUP', 'REFERENCE_TABLE', 'SUBTABLE'];
+  const optionFields = fields.filter(field => excludeFieldTypes.indexOf(field.type) < 0);
+  const conditionFields = optionFields.filter(field => excludeConditionFieldTypes.indexOf(field.type) < 0);
 
   const comparis = [
     {label: '一致', value: 'equal'},
@@ -65,12 +68,23 @@ export default function Config({pluginId}) {
     newOptions[optIdx].selectFields[selectFidx] = value;
     setOptions(newOptions);
   };
+  const hundleChangeAutoComplete_option = (optIdx, selectFidx, AC_Opt) => {
+    let newOptions = [...options];
+    newOptions[optIdx].selectFields[selectFidx] = AC_Opt ? AC_Opt.code: '';
+    setOptions(newOptions);
+  }
 
   const hundleChangeConditionField = (optIdx, condIdx, value) => {
     let newOptions = [...options];
     newOptions[optIdx].conditions[condIdx].field = value;
     setOptions(newOptions);
   };
+  const hundleChangeAutoComplete_condition = (optIdx, condIdx, AC_Cond) => {
+    let newOptions = [...options];
+    newOptions[optIdx].conditions[condIdx].field = AC_Cond ? AC_Cond.code: '';
+    setOptions(newOptions);
+  };
+
   const hundleChangeConditionCompare = (optIdx, condIdx, value) => {
     let newOptions = [...options];
     newOptions[optIdx].conditions[condIdx].compare = value;
@@ -99,12 +113,47 @@ export default function Config({pluginId}) {
     location.href = location.href.match(/.*\//)[0];
   };
 
-  useEffect(() => {  
-    KintoneConfigHelper.getFields().then(getFields => {
-        setFields(getFields.filter(getF => getF.type !== 'SPACER'));
-    }).catch(error => {
-      console.log(JSON.stringify(error));
-    });
+  // スタイルの拡張（orverride）
+  const theme = createTheme({
+    components: {
+      MuiAutocomplete: {
+        styleOverrides: {
+          root: {
+            '.MuiOutlinedInput-root': {
+              paddingTop: '2px', paddingBottom: '2px',
+              '.MuiAutocomplete-input': {
+                padding: 0
+              }
+            },
+            '.css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root': {
+              top: '50%', transform: 'translate(9px, -50%)'
+            }
+          }
+        }
+      }
+    }
+  });
+
+  useEffect(() => {
+    // フィールド取得
+    kintone.api(kintone.api.url('/k/v1/app/form/fields', true), 'GET', {app: kintone.app.getId()}, resp => {      
+      let fields = Object.keys(resp.properties).reduce((fields, fieldCode) => {
+        fields.push(resp.properties[fieldCode]);
+        if(resp.properties[fieldCode].code === 'SUBTABLE') {
+          fields = fields.concat(Object.keys(resp.properties[fieldCode].fields).map(key => resp.properties[fieldCode].fields[key]));
+        }
+        return fields;
+      }, []);
+      // スペース取得
+      KintoneConfigHelper.getFields('SPACER').then(resp => {
+        fields.concat(resp.map(spacer => ({type: spacer.type, label: spacer.elementId, label: spacer.elementId})));
+        setFields(fields);
+      }).catch(err => {
+        console.log(err);        
+      });            
+    }, err => {
+      console.log(err);
+    })
 
     if(pluginId) {
       const configObj = kintone.plugin.app.getConfig(pluginId);
@@ -121,6 +170,7 @@ export default function Config({pluginId}) {
   }, []);
 
   return(
+    <ThemeProvider theme={theme}>
     <div>
       <ul>
         {
@@ -129,15 +179,29 @@ export default function Config({pluginId}) {
               <p className="kintoneplugin-label"></p>
               <div className="select-fields">
                 <p className="kintoneplugin-title">表示を切替るフィールド</p>
-                <ul className="">
+                <ul className="show-toggle-fields">
                   {opt.selectFields.map((field, selectF_idx) =>
                     <li key={selectF_idx}>
-                      <select value={fields.filter(f => f.code === field).length ? field : ""} onChange={(e) => {hundleChangeSelectField(optIdx, selectF_idx,e.currentTarget.value)}}>
-                        <option value="" disabled>フィールドを選択してください。</option>
-                        {
-                          fields.map((field, idx) => <option value={field.code} key={idx}>{field.label ? field.label: field.code}</option>)
+                      <Autocomplete
+                        disablePortal                        
+                        options={optionFields.map((field, i) => ({label: field.label, type: field.type, code: field.code}))}
+                        isOptionEqualToValue={(option, value) => option.type === value.type && option.code === value.code}                        
+                        value={
+                          optionFields.findIndex(field => field.code === opt.selectFields[selectF_idx]) >= 0 ? 
+                            {code: opt.selectFields[selectF_idx], type: optionFields[optionFields.findIndex(field => field.code === opt.selectFields[selectF_idx])].type, label: optionFields[optionFields.findIndex(field => field.code === opt.selectFields[selectF_idx])].label} : null
                         }
-                      </select>
+                        sx={{ width: 300, display: 'inline-block', p: 0}}
+                        renderInput={(params) => <TextField {...params} label="Field" sx={{p: 0}}/>}
+                        renderOption={(props, option) => {
+                          return (
+                            <Box component="li" {...props} key={option.code} sx={{p: 0}}>
+                              {option.label}
+                            </Box>
+                          )
+                        }}
+                        noOptionsText="見つかりません"
+                        onChange={(event, value, reason) => {hundleChangeAutoComplete_option(optIdx, selectF_idx, value);}}
+                      />
                       <div className="buttons">
                         <button className="add-field-select" onClick={() => {hundleClickAddFieldSelect(optIdx,selectF_idx+1)}}><i className="fa fa-plus-circle" aria-hidden="true"></i></button>
                         {(() => {
@@ -173,12 +237,26 @@ export default function Config({pluginId}) {
                             })()
                           }
                           <div>
-                            <select value={conditionFields.filter(f => f.code === cond.field).length ? cond.field : ""} onChange={(e) => {hundleChangeConditionField(optIdx, condIdx, e.currentTarget.value)}}>
-                              <option value="" disabled>フィールドを選択してください。</option>
-                              {
-                                conditionFields.map((field, idx) => <option value={field.code} key={idx}>{field.label ? field.label: field.code}</option>)
-                              }
-                            </select>
+                          <Autocomplete
+                            disablePortal                        
+                            options={conditionFields.map((field, i) => ({label: field.label, type: field.type, code: field.code}))}
+                            isOptionEqualToValue={(option, value) => option.type === value.type && option.code === value.code}                        
+                            value={
+                              conditionFields.findIndex(field => field.code === opt.conditions[condIdx].field) >= 0 ? 
+                                {code: opt.conditions[condIdx].field, type: conditionFields[conditionFields.findIndex(field => field.code === opt.conditions[condIdx].field)].type, label: conditionFields[conditionFields.findIndex(field => field.code === opt.conditions[condIdx].field)].label} : null
+                            }
+                            sx={{ width: 300, display: 'inline-block', p: 0}}
+                            renderInput={(params) => <TextField {...params} label="Field" sx={{p: 0}}/>}
+                            renderOption={(props, option) => {
+                              return (
+                                <Box component="li" {...props} key={option.code} sx={{p: 0}}>
+                                  {option.label}
+                                </Box>
+                              )
+                            }}
+                            noOptionsText="見つかりません"
+                            onChange={(event, value, reason) => {hundleChangeAutoComplete_condition(optIdx, condIdx, value);}}
+                          />
                             <select value={cond.compare} onChange={(e) => {hundleChangeConditionCompare(optIdx, condIdx, e.currentTarget.value)}}>
                               <option value ="" disabled>条件を選択してください。</option>
                               {
@@ -213,6 +291,7 @@ export default function Config({pluginId}) {
         <button className="kintoneplugin-button-dialog-ok" onClick={() => {hundleClickSave()}}>保存する</button>
         <button className="kintoneplugin-button-dialog-cancel" onClick={() => {hundleClickCancel()}}>キャンセル</button>
       </div>
-    </div>   
+    </div> 
+    </ThemeProvider>  
   );
 }

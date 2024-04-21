@@ -39,6 +39,16 @@ module.exports = {
       }
     ]
   },
+  devServer: {
+    open: true,    
+    static: {
+      directory: path.join(__dirname, 'plugin'),      
+    },
+    compress: true
+  },
+  /* optimization: {
+    runtimeChunk: 'single',
+  }, */
   plugins: [
     new KintonePlugin({
       manifestJSONPath: './plugin/manifest.json',

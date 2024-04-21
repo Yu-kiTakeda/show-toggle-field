@@ -15,17 +15,32 @@ li.kintoneplugin-row {
     border-bottom: 2px solid #BABABA;
     font-weight: bold;
   }
+  .show-toggle-fields > li {
+    margin: 5px 0;
+  }
   .buttons {
     margin-top: 5px;
-    button {
+    position: relative;    
+    button {      
       font-size: 20px;
-      line-height: 1;
+      line-height: 1;            
       .fa-plus-circle, .fa-plus {
         color: #5de3cc;
       }
       .fa-minus-circle, .fa-minus {
         color: #FF0000;
       }
+    }
+    .add-field-select, .del-field-select {
+      position: absolute;
+      top: 50%;
+      transform: translate(0, -50%);
+    }
+    .add-field-select {
+      left: 5px;
+    }
+    .del-field-select {
+      left: 30px;
     }
   }
   
