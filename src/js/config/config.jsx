@@ -20,9 +20,11 @@ export default function Config({pluginId}) {
   const [fields, setFields] = useState([]);
 
   const excludeFieldTypes = ['CATEGORY', 'STATUS', 'STATUS_ASSIGNEE'];
-  const excludeConditionFieldTypes = ['FILE', 'GROUP', 'REFERENCE_TABLE', 'SUBTABLE'];
+  const excludeConditionFieldTypes = ['FILE', 'GROUP', 'REFERENCE_TABLE', 'SUBTABLE'];  
   const optionFields = fields.filter(field => excludeFieldTypes.indexOf(field.type) < 0);
-  const conditionFields = optionFields.filter(field => excludeConditionFieldTypes.indexOf(field.type) < 0);
+  const includeTableFields = optionFields.reduce((includeTableFields, field) => field.type === 'SUBTABLE' ? includeTableFields.concat(Object.keys(field.fields).map(key => field.fields[key])) : includeTableFields, [])
+  const conditionFields = optionFields.filter(field => excludeConditionFieldTypes.indexOf(field.type) < 0 && includeTableFields.indexOf(field) < 0);
+  const selectFields = optionFields.filter(field => field.options);
 
   const comparis = [
     {label: '一致', value: 'equal'},
@@ -90,6 +92,11 @@ export default function Config({pluginId}) {
     newOptions[optIdx].conditions[condIdx].compare = value;
     setOptions(newOptions);
   };
+  const hundleChangeAutoComplete_compare = (optIdx, condIdx, AC_Compare) => {
+    let newOptions = [...options];
+    newOptions[optIdx].conditions[condIdx].compare = AC_Compare ? AC_Compare.value : '';
+    setOptions(newOptions);
+  };
   const hundleChangeConditionCompareVal = (optIdx, condIdx, value) => {
     let newOptions = [...options];
     newOptions[optIdx].conditions[condIdx].compareVal = value;
@@ -139,7 +146,7 @@ export default function Config({pluginId}) {
     kintone.api(kintone.api.url('/k/v1/app/form/fields', true), 'GET', {app: kintone.app.getId()}, resp => {      
       let fields = Object.keys(resp.properties).reduce((fields, fieldCode) => {
         fields.push(resp.properties[fieldCode]);
-        if(resp.properties[fieldCode].code === 'SUBTABLE') {
+        if(resp.properties[fieldCode].type === 'SUBTABLE') {
           fields = fields.concat(Object.keys(resp.properties[fieldCode].fields).map(key => resp.properties[fieldCode].fields[key]));
         }
         return fields;
@@ -257,13 +264,21 @@ export default function Config({pluginId}) {
                             noOptionsText="見つかりません"
                             onChange={(event, value, reason) => {hundleChangeAutoComplete_condition(optIdx, condIdx, value);}}
                           />
-                            <select value={cond.compare} onChange={(e) => {hundleChangeConditionCompare(optIdx, condIdx, e.currentTarget.value)}}>
-                              <option value ="" disabled>条件を選択してください。</option>
-                              {
-                                comparis.map((compare, idx) => <option value={compare.value} key={idx}>{compare.label}</option>)
-                              }
-                            </select>
-                            <input type="text" placeholder="文字を入力してください。" value={cond.compareVal} onChange={(e) => {hundleChangeConditionCompareVal(optIdx, condIdx, e.currentTarget.value)}} />
+                            <Autocomplete                                                      
+                              options={comparis}                         
+                              value={comparis.findIndex(compare => compare.value === opt.conditions[condIdx].compare) >= 0 ?  comparis[comparis.findIndex(compare => compare.value === opt.conditions[condIdx].compare)] : null}
+                              sx={{ width: 150, display: 'inline-block', p: 0}}
+                              renderInput={(params) => <TextField {...params} label="条件" sx={{p: 0}}/>}                            
+                              onChange={(event, value, reason) => {hundleChangeAutoComplete_compare(optIdx, condIdx, value);}}
+                            />
+                            <Autocomplete
+                              freeSolo                        
+                              options={selectFields.filter(field => field.code === opt.conditions[condIdx].field).reduce((options, field) => Object.keys(field.options), [])}                            
+                              value={opt.conditions[condIdx].compareVal}
+                              sx={{ width: 150, display: 'inline-block', p: 0}}
+                              renderInput={(params) => <TextField {...params} label="値" sx={{p: 0}}/>}                            
+                              onChange={(event, value, reason) => {hundleChangeConditionCompareVal(optIdx, condIdx, value);}}
+                            />
                           </div>
                           <div className="buttons">
                             <button className="add-option" onClick={() => {hundleClickAddCondition(optIdx, condIdx+1)}}><i className="fa fa-plus-circle" aria-hidden="true"></i></button>
