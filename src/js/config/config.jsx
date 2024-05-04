@@ -143,7 +143,7 @@ export default function Config({pluginId}) {
 
   useEffect(() => {
     // フィールド取得
-    kintone.api(kintone.api.url('/k/v1/app/form/fields', true), 'GET', {app: kintone.app.getId()}, resp => {      
+    kintone.api(kintone.api.url('/k/v1/preview/app/form/fields', true), 'GET', {app: kintone.app.getId()}, resp => {      
       let fields = Object.keys(resp.properties).reduce((fields, fieldCode) => {
         fields.push(resp.properties[fieldCode]);
         if(resp.properties[fieldCode].type === 'SUBTABLE') {
