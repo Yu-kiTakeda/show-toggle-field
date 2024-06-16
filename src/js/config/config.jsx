@@ -153,7 +153,7 @@ export default function Config({pluginId}) {
       }, []);
       // スペース取得
       KintoneConfigHelper.getFields('SPACER').then(resp => {
-        fields.concat(resp.map(spacer => ({type: spacer.type, label: spacer.elementId, label: spacer.elementId})));
+        fields = fields.concat(resp.filter(spacer => spacer.elementId).map(spacer => ({type: spacer.type, label: spacer.elementId, code: spacer.elementId})));
         setFields(fields);
       }).catch(err => {
         console.log(err);        

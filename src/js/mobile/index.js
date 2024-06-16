@@ -84,9 +84,23 @@
       });
       opt.selectFields.map(field => {
         kintone.mobile.app.record.setFieldShown(field, (opt.isShowDefault ? !isShow : isShow));
+        if(!record[field]) {
+          // スペースの場合は要素を表示切替する
+          var spaceEl = kintone.mobile.app.record.getSpaceElement(field);
+          if(spaceEl) spaceShowToggle(spaceEl, (opt.isShowDefault ? !isShow : isShow));
+        }
       });
     })
 
     return event;
   });
+  /**
+   * スペース切替
+   * @param {HTMLElement} spaceElement : スペース要素
+   * @param {Boolean} isShow : 表示切替の真偽値
+   */
+  function spaceShowToggle(spaceElement, isShow) {
+    if(spaceElement) spaceElement.style.cssText += (isShow ? 'display: inline-block !important;' : 'display: none !important;');
+  }
+
 })(kintone.$PLUGIN_ID);
