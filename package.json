@@ -9,8 +9,8 @@
     "dev-server": "webpack serve --mode development --devtool eval-cheap-source-map",
     "build": "webpack --mode production",
     "first-packaging": "kintone-plugin-packer --out dist/plugin.zip ./",
-    "upload": "kintone-plugin-uploader --base-url https://xxxx.cybozu.com --username xxxx --password xxxx dist/plugin.1.0.8.zip",
-    "devAndUpload": "webpack --mode development --devtool eval-cheap-source-map && kintone-plugin-uploader --base-url https://xxxx.cybozu.com --username xxxx --password xxxx dist/plugin.1.0.8.zip"
+    "upload": "kintone-plugin-uploader --base-url https://dev-takeda.cybozu.com --username takeda --password yu950501 dist/plugin.1.1.0.zip",
+    "devAndUpload": "webpack --mode development --devtool eval-cheap-source-map && kintone-plugin-uploader --base-url https://dev-takeda.cybozu.com --username takeda --password yu950501 dist/plugin.1.1.0.zip"
   },
   "keywords": [],
   "author": "",

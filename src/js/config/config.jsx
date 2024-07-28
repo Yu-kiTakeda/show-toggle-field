@@ -6,11 +6,12 @@ import { createTheme } from "@mui/material/styles";
 export default function Config({pluginId}) {
     
   const initialCondition = {
-    field: '', compare: '', compareVal: '', isOr: true
+    field: '', compare: '', compareVal: '', isOr: true,
   };
   const initialOption = {
     selectFields: [""],
     isShowDefault: true,
+    applyPage: 'all',
     conditions: [
       initialCondition
     ]
@@ -102,7 +103,12 @@ export default function Config({pluginId}) {
     newOptions[optIdx].conditions[condIdx].compareVal = value;
     setOptions(newOptions);
   };
-  const hundleChangeRadio = (optIdx, value) => {
+  const hundleChangeApplyPageRadio = (optIdx, value) => {
+    let newOptions = [...options];
+    newOptions[optIdx].applyPage = value;
+    setOptions(newOptions);
+  };
+  const hundleChangeShowDefaultRadio = (optIdx, value) => {
     let newOptions = [...options];
     newOptions[optIdx].isShowDefault = value === 'show';
     setOptions(newOptions);
@@ -132,7 +138,7 @@ export default function Config({pluginId}) {
                 padding: 0
               }
             },
-            '.css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root': {
+            '.MuiInputLabel-root:not(.MuiInputLabel-shrink)': {
               top: '50%', transform: 'translate(9px, -50%)'
             }
           }
@@ -221,11 +227,17 @@ export default function Config({pluginId}) {
               </div>
               <div className="select-conditions">
               <p className="kintoneplugin-title">表示切替の条件</p>
-                <div className="isShow-default">
-                  <p className="radio-title">初期状態</p>
-                  <label><input type="radio" value="show" checked={opt.isShowDefault} onChange={(e) => { hundleChangeRadio(optIdx, e.currentTarget.value); }} />表示</label>
-                  <label><input type="radio" value="hidden" checked={!opt.isShowDefault} onChange={(e) => { hundleChangeRadio(optIdx, e.currentTarget.value); }}/>非表示</label>
+                <div className="radio-condition apply-page">
+                  <p className="radio-title">適用画面</p>
+                  <label><input type="radio" value="all" checked={opt.applyPage === 'all'} onChange={(e) => { hundleChangeApplyPageRadio(optIdx, e.currentTarget.value); }} />全て</label>
+                  <label><input type="radio" value="detail" checked={opt.applyPage === 'detail'} onChange={(e) => { hundleChangeApplyPageRadio(optIdx, e.currentTarget.value); }} />詳細画面</label>
+                  <label><input type="radio" value="edit" checked={opt.applyPage === 'edit'} onChange={(e) => { hundleChangeApplyPageRadio(optIdx, e.currentTarget.value); }} />編集画面</label>
                 </div>
+                <div className="radio-condition isShow-default">
+                  <p className="radio-title">初期状態</p>
+                  <label><input type="radio" value="show" checked={opt.isShowDefault} onChange={(e) => { hundleChangeShowDefaultRadio(optIdx, e.currentTarget.value); }} />表示</label>
+                  <label><input type="radio" value="hidden" checked={!opt.isShowDefault} onChange={(e) => { hundleChangeShowDefaultRadio(optIdx, e.currentTarget.value); }}/>非表示</label>
+                </div>                
                 <ul className="list-condition">
                   {
                     opt.conditions.map((cond, condIdx) => {

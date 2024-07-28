@@ -6,6 +6,6 @@ import "../../css/config.scss";
 
 ((PLUGIN_ID) => {
   const root = createRoot(document.getElementById('root'));
-  root.render(<React.StrictMode><Config pluginId={PLUGIN_ID} /></React.StrictMode>);
+  root.render(<Config pluginId={PLUGIN_ID} />);
 })(kintone.$PLUGIN_ID);
 

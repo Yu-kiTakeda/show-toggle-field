@@ -27,7 +27,9 @@
     //イベントタイプのラストワード
     const eTypeLastWord = event.type.substr(event.type.lastIndexOf('.') + 1);
 
-    const targetOptions = eTypeLastWord === 'show' ? options : options.filter(opt => opt.conditions.findIndex(cond => cond.field === eTypeLastWord) >= 0);
+    const targetOptions = eTypeLastWord === 'show' ? 
+      options.filter(opt => (!opt.applyPage || opt.applyPage === 'all') ? true : (opt.applyPage === 'detail' && event.type === 'app.record.detail.show') ? true : (opt.applyPage === 'edit' && (event.type === 'app.record.edit.show' || event.type === 'app.record.create.show')) ? true : false)
+    : options.filter(opt => (!opt.applyPage || opt.applyPage === 'all' || opt.applyPage === 'edit') && opt.conditions.findIndex(cond => cond.field === eTypeLastWord) >= 0);
 
     targetOptions.map(opt => {
       let isShow = false;
