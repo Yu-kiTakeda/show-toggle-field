@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { Autocomplete, TextField, Box, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
+import { initalData } from "./initalData";
 // import { KintoneConfigHelper } from "KintoneConfigHelper";
 
 export default function Config({pluginId}) {
@@ -178,6 +179,20 @@ export default function Config({pluginId}) {
           return newOpt;
         });
         setOptions(newOptions);      
+      } else {
+        (async () => {
+          // 初期値設定
+          const defaultOptions = await initalData(kintone.app.getId());
+
+          const newOptions = [];
+          for(let i = 0; i < defaultOptions.length; i++) {
+            let option = Object.assign({}, initialOption);
+            option = defaultOptions[i];
+            newOptions.push(option);
+          }
+
+          setOptions(newOptions); 
+        })();
       }
     }
   }, []);
