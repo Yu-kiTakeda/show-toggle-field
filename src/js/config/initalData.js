@@ -260,6 +260,24 @@ export async function initalData(appId) {
             ];
         }
 
+        //もし、dataが空だったら、初期値を空で設定
+        if(data.length == 0) {
+            data = [
+                {
+                    applyPage: 'all',
+                    isShowDefault: false,
+                    selectFields: [''],
+                    conditions: [
+                    {
+                        compare: "equal",
+                        compareVal: "",
+                        field: "",
+                        isOr: true,
+                    }
+                    ]
+                }
+            ];
+        }
     } catch(e) {
         console.log(e);
         console.log('initalData: 初期値の取得に失敗しました。');
