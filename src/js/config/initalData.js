@@ -33,7 +33,7 @@ export async function initalData(appId) {
                         isOr: true,
                     }
                     ]
-                }
+                },
             ];
         }
 
